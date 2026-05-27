@@ -1,0 +1,19 @@
+current directory: /Users/jima/dev/column-keeper/backend/vendor/bundle/ruby/3.2.0/gems/racc-1.8.1/ext/racc/cparse
+/Users/jima/.rbenv/versions/3.2.2/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/jima/dev/column-keeper/backend/vendor/bundle/ruby/3.2.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20260527-42670-9iddxz sitelibdir\=./.gem.20260527-42670-9iddxz clean
+
+current directory: /Users/jima/dev/column-keeper/backend/vendor/bundle/ruby/3.2.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20260527-42670-9iddxz sitelibdir\=./.gem.20260527-42670-9iddxz
+compiling cparse.c
+linking shared-object racc/cparse.bundle
+ld: warning: ignoring duplicate libraries: '-lruby.3.2'
+
+current directory: /Users/jima/dev/column-keeper/backend/vendor/bundle/ruby/3.2.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20260527-42670-9iddxz sitelibdir\=./.gem.20260527-42670-9iddxz install
+/usr/bin/install -c -m 0755 cparse.bundle ./.gem.20260527-42670-9iddxz/racc
+
+current directory: /Users/jima/dev/column-keeper/backend/vendor/bundle/ruby/3.2.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20260527-42670-9iddxz sitelibdir\=./.gem.20260527-42670-9iddxz clean

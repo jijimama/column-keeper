@@ -1,0 +1,19 @@
+current directory: /Users/jima/dev/column-keeper/backend/vendor/bundle/ruby/3.2.0/gems/websocket-driver-0.8.0/ext/websocket-driver
+/Users/jima/.rbenv/versions/3.2.2/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/jima/dev/column-keeper/backend/vendor/bundle/ruby/3.2.0/gems/websocket-driver-0.8.0/ext/websocket-driver
+make DESTDIR\= sitearchdir\=./.gem.20260527-42670-ld3a3q sitelibdir\=./.gem.20260527-42670-ld3a3q clean
+
+current directory: /Users/jima/dev/column-keeper/backend/vendor/bundle/ruby/3.2.0/gems/websocket-driver-0.8.0/ext/websocket-driver
+make DESTDIR\= sitearchdir\=./.gem.20260527-42670-ld3a3q sitelibdir\=./.gem.20260527-42670-ld3a3q
+compiling websocket_mask.c
+linking shared-object websocket_mask.bundle
+ld: warning: ignoring duplicate libraries: '-lruby.3.2'
+
+current directory: /Users/jima/dev/column-keeper/backend/vendor/bundle/ruby/3.2.0/gems/websocket-driver-0.8.0/ext/websocket-driver
+make DESTDIR\= sitearchdir\=./.gem.20260527-42670-ld3a3q sitelibdir\=./.gem.20260527-42670-ld3a3q install
+/usr/bin/install -c -m 0755 websocket_mask.bundle ./.gem.20260527-42670-ld3a3q
+
+current directory: /Users/jima/dev/column-keeper/backend/vendor/bundle/ruby/3.2.0/gems/websocket-driver-0.8.0/ext/websocket-driver
+make DESTDIR\= sitearchdir\=./.gem.20260527-42670-ld3a3q sitelibdir\=./.gem.20260527-42670-ld3a3q clean
