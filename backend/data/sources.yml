@@ -1,0 +1,14 @@
+# 過去コラムCSVと新聞・コラムのマッピング。
+# 新しい新聞・コラムを追加するときはこの YAML に1ブロック足し、
+# 対応する CSV を同じ data/ に置く。CSV はヘッダなし4列「年,月,日,本文」。
+#
+# 取り込み方:
+#   bin/rails columns:import_all
+#
+# 何度実行しても OK:
+#   - 同じ日付の記事は本文を上書き更新
+#   - 空セル/不正な日付の行は skip
+#   - CSV ファイルが空でも OK
+- file: mainichi_yoroku.csv
+  newspaper: 毎日新聞
+  column: 余録
