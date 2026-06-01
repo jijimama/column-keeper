@@ -10,6 +10,13 @@ module Api
       scope = scope.where(columns: { newspaper_id: params[:newspaper_id] }) if params[:newspaper_id].present?
       scope = scope.where.not(favorites: { id: nil }) if params[:favorited] == "true"
 
+      if params[:month].present?
+        scope = scope.where("strftime('%m', published_on) = ?", format("%02d", params[:month].to_i))
+      end
+      if params[:day].present?
+        scope = scope.where("strftime('%d', published_on) = ?", format("%02d", params[:day].to_i))
+      end
+
       render json: scope.map { |e| serialize_list(e) }
     end
 

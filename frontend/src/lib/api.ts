@@ -32,6 +32,8 @@ export type ColumnEntryFilters = {
   newspaper_id?: string;
   column_id?: string;
   favorited?: string;
+  month?: string;
+  day?: string;
 };
 
 function buildUrl(path: string, params?: Record<string, string | undefined>) {
