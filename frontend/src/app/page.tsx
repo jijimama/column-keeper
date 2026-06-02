@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listColumnEntries, type ColumnEntryFilters } from "@/lib/api";
 import { FilterForm } from "@/components/FilterForm";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { Pagination } from "@/components/Pagination";
 import { newspaperStyle } from "@/lib/newspaper-style";
 
 type Props = {
@@ -11,6 +12,7 @@ type Props = {
     favorited?: string;
     month?: string;
     day?: string;
+    page?: string;
   }>;
 };
 
@@ -22,8 +24,9 @@ export default async function ListPage({ searchParams }: Props) {
     favorited: sp.favorited,
     month: sp.month,
     day: sp.day,
+    page: sp.page,
   };
-  const entries = await listColumnEntries(filters);
+  const { entries, pagination } = await listColumnEntries(filters);
 
   return (
     <div className="mx-auto max-w-4xl p-6">
@@ -37,7 +40,7 @@ export default async function ListPage({ searchParams }: Props) {
           </p>
         </div>
         <span className="text-sm text-stone-500 dark:text-stone-400">
-          {entries.length} 件
+          {pagination.total_count} 件
         </span>
       </header>
 
@@ -94,6 +97,8 @@ export default async function ListPage({ searchParams }: Props) {
           );
         })}
       </ul>
+
+      <Pagination pagination={pagination} filters={filters} />
     </div>
   );
 }

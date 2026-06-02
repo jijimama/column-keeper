@@ -34,6 +34,19 @@ export type ColumnEntryFilters = {
   favorited?: string;
   month?: string;
   day?: string;
+  page?: string;
+};
+
+export type Pagination = {
+  page: number;
+  per_page: number;
+  total_count: number;
+  total_pages: number;
+};
+
+export type ColumnEntryListResult = {
+  entries: ColumnEntry[];
+  pagination: Pagination;
 };
 
 function buildUrl(path: string, params?: Record<string, string | undefined>) {
@@ -48,7 +61,7 @@ function buildUrl(path: string, params?: Record<string, string | undefined>) {
 
 export async function listColumnEntries(
   filters?: ColumnEntryFilters
-): Promise<ColumnEntry[]> {
+): Promise<ColumnEntryListResult> {
   const res = await fetch(buildUrl("/api/column_entries", filters), {
     cache: "no-store",
   });

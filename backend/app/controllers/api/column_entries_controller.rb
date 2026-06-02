@@ -2,6 +2,9 @@ module Api
   class ColumnEntriesController < ApplicationController
     SNIPPET_LENGTH = 120
 
+    DEFAULT_PER_PAGE = 20
+    MAX_PER_PAGE = 100
+
     def index
       scope = ColumnEntry.eager_load(:favorite, column: :newspaper)
                         .order(published_on: :desc, id: :desc)
@@ -17,7 +20,23 @@ module Api
         scope = scope.where("strftime('%d', published_on) = ?", format("%02d", params[:day].to_i))
       end
 
-      render json: scope.map { |e| serialize_list(e) }
+      per_page = (params[:per_page].presence || DEFAULT_PER_PAGE).to_i.clamp(1, MAX_PER_PAGE)
+      page = (params[:page].presence || 1).to_i
+      page = 1 if page < 1
+
+      total_count = scope.distinct.count(:id)
+      total_pages = total_count.zero? ? 0 : (total_count.to_f / per_page).ceil
+      entries = scope.limit(per_page).offset((page - 1) * per_page)
+
+      render json: {
+        entries: entries.map { |e| serialize_list(e) },
+        pagination: {
+          page: page,
+          per_page: per_page,
+          total_count: total_count,
+          total_pages: total_pages
+        }
+      }
     end
 
     def show
