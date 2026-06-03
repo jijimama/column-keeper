@@ -3,6 +3,7 @@ import { listColumnEntries, type ColumnEntryFilters } from "@/lib/api";
 import { FilterForm } from "@/components/FilterForm";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { Pagination } from "@/components/Pagination";
+import { ScrapeButton } from "@/components/ScrapeButton";
 import { newspaperStyle } from "@/lib/newspaper-style";
 
 type Props = {
@@ -30,7 +31,7 @@ export default async function ListPage({ searchParams }: Props) {
 
   return (
     <div className="mx-auto max-w-4xl p-6">
-      <header className="mb-6 flex items-baseline justify-between border-b border-stone-200 dark:border-stone-800 pb-4">
+      <header className="mb-6 flex items-end justify-between gap-4 border-b border-stone-200 dark:border-stone-800 pb-4">
         <div>
           <h1 className="font-serif text-3xl tracking-wide text-stone-900 dark:text-stone-100">
             column-keeper
@@ -39,9 +40,12 @@ export default async function ListPage({ searchParams }: Props) {
             新聞コラムを集めて読む
           </p>
         </div>
-        <span className="text-sm text-stone-500 dark:text-stone-400">
-          {pagination.total_count} 件
-        </span>
+        <div className="flex flex-col items-end gap-2">
+          <ScrapeButton />
+          <span className="text-xs text-stone-500 dark:text-stone-400">
+            {pagination.total_count} 件
+          </span>
+        </div>
       </header>
 
       <FilterForm filters={filters} />

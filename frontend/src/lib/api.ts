@@ -109,3 +109,30 @@ export async function listColumns(
   if (!res.ok) throw new Error(`Failed to fetch columns: ${res.status}`);
   return res.json();
 }
+
+export type ScrapeResultItem = {
+  newspaper: string;
+  column: string;
+  status: "created" | "updated" | "error";
+  error?: string;
+};
+
+export type ScrapeResult = {
+  results: ScrapeResultItem[];
+  summary: {
+    total: number;
+    created: number;
+    updated: number;
+    failed: number;
+  };
+};
+
+export async function scrapeLatest(newspaper?: string): Promise<ScrapeResult> {
+  const res = await fetch(buildUrl("/api/scrapes"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(newspaper ? { newspaper } : {}),
+  });
+  if (!res.ok) throw new Error(`Failed to scrape: ${res.status}`);
+  return res.json();
+}

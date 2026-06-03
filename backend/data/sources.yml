@@ -1,14 +1,244 @@
 # 過去コラムCSVと新聞・コラムのマッピング。
-# 新しい新聞・コラムを追加するときはこの YAML に1ブロック足し、
-# 対応する CSV を同じ data/ に置く。CSV はヘッダなし4列「年,月,日,本文」。
+# CSV はヘッダなし4列「年,月,日,本文」。空ファイルOK。
 #
-# 取り込み方:
+# 取り込み:
 #   bin/rails columns:import_all
 #
-# 何度実行しても OK:
-#   - 同じ日付の記事は本文を上書き更新
-#   - 空セル/不正な日付の行は skip
-#   - CSV ファイルが空でも OK
+# scrape: ブロックがある source は POST /api/scrapes で
+# 最新コラムをスクレイピングできる（静的HTML対応のみ）。
+#
+# scrape: のキー
+#   base_url        : 一覧 or 詳細URL
+#   list_selector   : 一覧記事リンクのCSS（空なら base_url を詳細扱い）
+#   list_index      : 何番目のリンクか（既定 0）
+#   detail_base_url : 詳細URLが相対のときの基底
+#   detail_selector : 詳細本文のCSS
+#   date_selector   : 日付のCSS
+#   date_regexp     : 日付文字列の正規表現（$1=年, $2=月, $3=日）
+#   replace_rules   : URL置換（例: {detail: moredetail}）
+
+# --- ログイン/JS要のため未対応 ---
+- file: asahi_tensei.csv
+  newspaper: 朝日新聞
+  column: 天声人語
+- file: tokyo_hissen.csv
+  newspaper: 東京新聞
+  column: 筆洗
+
+# --- 全国紙 ---
 - file: mainichi_yoroku.csv
   newspaper: 毎日新聞
   column: 余録
+  scrape:
+    base_url: https://mainichi.jp/yoroku/
+    list_selector: "ul.articlelist li a"
+    list_index: 0
+    detail_base_url: "https:"
+    detail_selector: "section#articledetail-body p"
+    date_selector: "span.articletag-date"
+    date_regexp: '(\d{4})/(\d{1,2})/(\d{1,2})'
+
+# --- 北海道・東北 ---
+- file: tooku_tenchijin.csv
+  newspaper: 東奥日報
+  column: 天地人
+  scrape:
+    base_url: https://www.toonippo.co.jp/category/tenchijin
+    list_selector: 'a[href^="/articles/-/"]'
+    detail_base_url: https://www.toonippo.co.jp
+    detail_selector: "div.article-body p"
+    date_selector: "div.pubdate"
+    date_regexp: '(\d{4})年(\d{1,2})月(\d{1,2})日'
+
+- file: mutsu_toukagen.csv
+  newspaper: 陸奥新報
+  column: 冬夏言
+  scrape:
+    base_url: https://mutsushimpo.com/toukagen/
+    list_selector: "div.entry_panel_wrap article a"
+    detail_selector: "div.post_body p"
+    date_selector: "p.post_date"
+    date_regexp: '(\d{4})/(\d{1,2})/(\d{1,2})'
+
+- file: akita_hokutosei.csv
+  newspaper: 秋田魁新報
+  column: 北斗星
+  scrape:
+    base_url: https://www.sakigake.jp/news/list/ccd/opinion/
+    list_selector: "div.p-articles__list div.p-articles__item article.c-article-module a"
+    list_index: 1
+    detail_base_url: https://www.sakigake.jp/
+    detail_selector: "div.p-article-body p"
+    date_selector: "time.p-article-head__update"
+    date_regexp: '(\d{4})年(\d{1,2})月(\d{1,2})日'
+
+- file: yamagata_danwa.csv
+  newspaper: 山形新聞
+  column: 談話室
+  scrape:
+    base_url: https://www.yamagata-np.jp/danwa/
+    detail_selector: "div#danwa_main p"
+    date_selector: 'div[align="right"]'
+    date_regexp: '(\d{4})/(\d{1,2})/(\d{1,2})'
+
+- file: iwate_nichinichisou.csv
+  newspaper: 岩手日日新聞
+  column: 日日草
+  scrape:
+    base_url: https://www.iwanichi.co.jp/nichinichiso/
+    detail_selector: "div.post_txt p"
+    date_selector: "div.nichi_post_title h1"
+    date_regexp: '(\d{4})年(\d{1,2})月(\d{1,2})日'
+
+- file: iwaki_katasumi.csv
+  newspaper: いわき日報
+  column: 片隅抄
+  scrape:
+    base_url: https://iwaki-minpo.co.jp/category/katasumisyou/
+    list_selector: "div.blog_list article a"
+    detail_selector: "div.post_content p"
+    date_selector: "li.date time"
+    date_regexp: '(\d{4}).(\d{1,2}).(\d{1,2})'
+
+# --- 関東 ---
+- file: ibaraki_syunjuu.csv
+  newspaper: 茨城新聞
+  column: いばらき春秋
+  scrape:
+    base_url: https://ibarakinews.jp/news/newsdetail.php?elem=syunju
+    detail_selector: "div.font-main p"
+    date_selector: "div.post-updated time"
+    date_regexp: '(\d{4})年(\d{1,2})月(\d{1,2})日'
+
+- file: kamige_miyama.csv
+  newspaper: 上毛新聞
+  column: 三山春秋
+  scrape:
+    base_url: https://www.jomo-news.co.jp/category/miyama
+    list_selector: "div.l-articles article a"
+    detail_base_url: https://www.jomo-news.co.jp
+    detail_selector: "div.article-body>p"
+    date_selector: "h1.article-header__ttl"
+    date_regexp: '(\d{4})/(\d{1,2})/(\d{1,2})'
+
+# --- 信越 ---
+- file: niigata_nipposho.csv
+  newspaper: 新潟日報
+  column: 日報抄
+  scrape:
+    base_url: https://www.niigata-nippo.co.jp/category/nipposho
+    list_selector: "div.l-articles div.m-article div.m-article__body a"
+    detail_base_url: https://www.niigata-nippo.co.jp
+    detail_selector: "div.article-body"
+    date_selector: "time.c-date"
+    date_regexp: '(\d{4})/(\d{1,2})/(\d{1,2})'
+
+- file: nagano_hachimenkan.csv
+  newspaper: 長野日報
+  column: 八面観
+  scrape:
+    base_url: https://www.nagano-np.co.jp/news/?id=1007
+    list_selector: "div.articles div.article a"
+    detail_base_url: https://www.nagano-np.co.jp
+    detail_selector: "div.cnt p"
+    date_selector: "div.panel.date"
+    date_regexp: '(\d{4})/(\d{1,2})/(\d{1,2})'
+
+- file: shimin_misuzu.csv
+  newspaper: 市民タイムス
+  column: みすず野
+  scrape:
+    base_url: https://www.shimintimes.co.jp/features/misuzuno/
+    list_selector: "a.card-title"
+    detail_selector: "div.content-block-body p"
+    date_selector: "div.content-block-header div.date"
+    date_regexp: '(\d{4})/(\d{1,2})/(\d{1,2})'
+
+# --- 東海・関西 ---
+- file: ise_taikan.csv
+  newspaper: 伊勢新聞
+  column: 大観小観
+  scrape:
+    base_url: https://www.isenp.co.jp/category/taikan/
+    list_selector: "div#main-content h3.mh-loop-title a"
+    detail_selector: "div.entry-content p"
+    date_selector: "h1.entry-title"
+    date_regexp: '(\d{4})年(\d{1,2})月(\d{1,2})日'
+
+- file: nara_kuniharafu.csv
+  newspaper: 奈良新聞
+  column: 国原譜
+  scrape:
+    base_url: https://www.nara-np.co.jp/opinion/kuniharafu.html
+    list_selector: "section.cmp_section ul li.item a"
+    detail_base_url: https://www.nara-np.co.jp/
+    detail_selector: "div.system-free p"
+    date_selector: "div.date time"
+    date_regexp: '(\d{4}).(\d{1,2}).(\d{1,2})'
+
+# --- 中国 ---
+- file: sanin_meisou.csv
+  newspaper: 山陰中央新報
+  column: 明窓
+  scrape:
+    base_url: https://www.sanin-chuo.co.jp/category/meiso
+    list_selector: "div.m-articles h2.m-articles-item__ttl a"
+    detail_base_url: https://www.sanin-chuo.co.jp
+    detail_selector: "div.article-body p"
+    date_selector: "time.article-header-info__pubdate"
+    date_regexp: '(\d{4})/(\d{1,2})/(\d{1,2})'
+
+- file: sanyo_tekiitteki.csv
+  newspaper: 山陽新聞
+  column: 滴一滴
+  scrape:
+    base_url: https://www.sanyonews.jp/opinion/tekiitteki/1/
+    list_selector: "div.post_list div.post_thm a"
+    detail_base_url: https://www.sanyonews.jp/
+    detail_selector: "div.article_contents"
+    date_selector: "div.article_date"
+    date_regexp: '(\d{4})年(\d{1,2})月(\d{1,2})日'
+
+# --- 四国 ---
+- file: kochi_syousyakai.csv
+  newspaper: 高知新聞
+  column: 小社会
+  scrape:
+    base_url: https://www.kochinews.co.jp/tag/detail/s_syosyakai
+    list_selector: "div.articlesList ul li a"
+    detail_base_url: https://www.kochinews.co.jp
+    detail_selector: "div.article_wrap"
+    date_selector: "p.date"
+    date_regexp: '(\d{4}).(\d{1,2}).(\d{1,2})'
+
+# --- 九州・沖縄 ---
+- file: saga_ariakesho.csv
+  newspaper: 佐賀新聞
+  column: 有明抄
+  scrape:
+    base_url: https://www.saga-s.co.jp/category/opinion-ariakesyou
+    list_selector: "div.m-articles a"
+    detail_base_url: https://www.saga-s.co.jp
+    detail_selector: "div.article-body p"
+    date_selector: "time.article-header__date"
+    date_regexp: '(\d{4})/(\d{1,2})/(\d{1,2})'
+
+- file: yae_furenzoku.csv
+  newspaper: 八重山毎日新聞
+  column: 不連続線
+  scrape:
+    base_url: https://www.y-mainichi.co.jp/category/furenzokusen/
+    list_selector: "div#entry div.entry h3 a"
+    detail_selector: "div.content p"
+    date_selector: "ul.information li"
+    date_regexp: '(\d{4})年(\d{1,2})月(\d{1,2})日'
+
+- file: ryukyu_kinkoubokushita.csv
+  newspaper: 琉球新報
+  column: 金口木舌
+  scrape:
+    base_url: https://ryukyushimpo.jp/column
+    list_selector: "div.flex-none.order-1 a"
+    detail_selector: "div.entry-content.text-gray.prose-base p"
+    date_selector: "time.entry-date.published"
+    date_regexp: '(\d{4})年(\d{1,2})月(\d{1,2})日'

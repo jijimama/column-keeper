@@ -7,5 +7,6 @@ Rails.application.routes.draw do
     resources :column_entries, only: [:index, :show] do
       resource :favorite, only: [:create, :destroy]
     end
+    resources :scrapes, only: [:create]
   end
 end
