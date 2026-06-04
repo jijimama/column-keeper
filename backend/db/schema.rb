@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_05_27_234450) do
+ActiveRecord::Schema[7.2].define(version: 2026_06_04_212025) do
   create_table "column_entries", force: :cascade do |t|
     t.integer "column_id", null: false
     t.date "published_on", null: false
@@ -30,6 +30,15 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_27_234450) do
     t.string "source_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "scrape_enabled", default: false, null: false
+    t.string "scrape_base_url"
+    t.string "scrape_list_selector"
+    t.integer "scrape_list_index", default: 0, null: false
+    t.string "scrape_detail_base_url"
+    t.string "scrape_detail_selector"
+    t.string "scrape_date_selector"
+    t.string "scrape_date_regexp"
+    t.text "scrape_replace_rules"
     t.index ["newspaper_id", "name"], name: "index_columns_on_newspaper_id_and_name", unique: true
     t.index ["newspaper_id"], name: "index_columns_on_newspaper_id"
   end

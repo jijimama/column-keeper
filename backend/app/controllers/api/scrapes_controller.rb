@@ -1,25 +1,15 @@
-require "yaml"
-
 module Api
   class ScrapesController < ApplicationController
     def create
-      sources_path = Rails.root.join("data", "sources.yml")
-      unless File.exist?(sources_path)
-        return render json: { error: "sources.yml が見つかりません" }, status: :unprocessable_entity
-      end
-
-      sources = YAML.load_file(sources_path)
       newspaper = params[:newspaper].presence
+      scope = Column.includes(:newspaper).where(scrape_enabled: true)
+      scope = scope.joins(:newspaper).where(newspapers: { name: newspaper }) if newspaper
 
-      targets = sources.select do |src|
-        next false unless src["scrape"].is_a?(Hash)
-        newspaper.nil? || src["newspaper"] == newspaper
-      end
+      targets = scope.to_a
 
-      # 各サイトへの連続アクセスを避けるため1秒間隔。最後の1件は sleep 不要
-      results = targets.each_with_index.map do |src, idx|
+      results = targets.each_with_index.map do |column, idx|
         sleep 1 if idx.positive?
-        run_one(src)
+        run_one(column)
       end
 
       render json: {
@@ -30,33 +20,23 @@ module Api
 
     private
 
-    def run_one(src)
+    def run_one(column)
       status = ColumnScraper.new(
-        newspaper_name: src["newspaper"],
-        column_name: src["column"],
-        config: src["scrape"]
+        newspaper_name: column.newspaper.name,
+        column_name: column.name,
+        config: column.scrape_config
       ).scrape!
 
       {
-        newspaper: src["newspaper"],
-        column: src["column"],
+        newspaper: column.newspaper.name,
+        column: column.name,
         status: status.to_s
       }
     rescue ColumnScraper::ScrapeError => e
-      {
-        newspaper: src["newspaper"],
-        column: src["column"],
-        status: "error",
-        error: e.message
-      }
+      { newspaper: column.newspaper.name, column: column.name, status: "error", error: e.message }
     rescue StandardError => e
       Rails.logger.error("[ScrapesController] unexpected: #{e.class}: #{e.message}")
-      {
-        newspaper: src["newspaper"],
-        column: src["column"],
-        status: "error",
-        error: "予期しないエラー: #{e.class}"
-      }
+      { newspaper: column.newspaper.name, column: column.name, status: "error", error: "予期しないエラー: #{e.class}" }
     end
 
     def summarize(results)
