@@ -8,5 +8,9 @@ Rails.application.routes.draw do
       resource :favorite, only: [:create, :destroy]
     end
     resources :scrapes, only: [:create]
+
+    namespace :admin do
+      resources :newspapers, only: [:index, :create, :update, :destroy]
+    end
   end
 end

@@ -136,3 +136,88 @@ export async function scrapeLatest(newspaper?: string): Promise<ScrapeResult> {
   if (!res.ok) throw new Error(`Failed to scrape: ${res.status}`);
   return res.json();
 }
+
+// ===== Admin: Newspaper =====
+
+export type AdminNewspaper = {
+  id: number;
+  name: string;
+  columns_count: number;
+};
+
+export type AdminError = {
+  errors?: Record<string, string[]>;
+  message?: string;
+};
+
+async function adminFetch(
+  path: string,
+  init: RequestInit
+): Promise<Response> {
+  const res = await fetch(buildUrl(path), {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...(init.headers ?? {}),
+    },
+  });
+  return res;
+}
+
+async function readErrorBody(res: Response): Promise<AdminError> {
+  try {
+    return (await res.json()) as AdminError;
+  } catch {
+    return { message: `HTTP ${res.status}` };
+  }
+}
+
+export async function listAdminNewspapers(): Promise<AdminNewspaper[]> {
+  const res = await fetch(buildUrl("/api/admin/newspapers"), {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Failed to list newspapers: ${res.status}`);
+  return res.json();
+}
+
+export async function createNewspaper(name: string): Promise<AdminNewspaper> {
+  const res = await adminFetch("/api/admin/newspapers", {
+    method: "POST",
+    body: JSON.stringify({ newspaper: { name } }),
+  });
+  if (!res.ok) {
+    const body = await readErrorBody(res);
+    throw new Error(formatErrors(body) || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function updateNewspaper(
+  id: number,
+  name: string
+): Promise<AdminNewspaper> {
+  const res = await adminFetch(`/api/admin/newspapers/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ newspaper: { name } }),
+  });
+  if (!res.ok) {
+    const body = await readErrorBody(res);
+    throw new Error(formatErrors(body) || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function deleteNewspaper(id: number): Promise<void> {
+  const res = await adminFetch(`/api/admin/newspapers/${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error(`Failed to delete newspaper: ${res.status}`);
+}
+
+function formatErrors(body: AdminError): string {
+  if (body.message) return body.message;
+  if (!body.errors) return "";
+  return Object.entries(body.errors)
+    .map(([k, v]) => `${k}: ${v.join(", ")}`)
+    .join("; ");
+}
