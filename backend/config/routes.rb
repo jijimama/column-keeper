@@ -11,6 +11,7 @@ Rails.application.routes.draw do
 
     namespace :admin do
       resources :newspapers, only: [:index, :create, :update, :destroy]
+      resources :columns, only: [:index, :show, :create, :update, :destroy]
     end
   end
 end

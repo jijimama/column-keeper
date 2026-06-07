@@ -221,3 +221,87 @@ function formatErrors(body: AdminError): string {
     .map(([k, v]) => `${k}: ${v.join(", ")}`)
     .join("; ");
 }
+
+// ===== Admin: Column =====
+
+export type AdminColumn = {
+  id: number;
+  name: string;
+  source_url: string | null;
+  newspaper: { id: number; name: string };
+  scrape_enabled: boolean;
+  scrape_base_url: string | null;
+  scrape_list_selector: string | null;
+  scrape_list_index: number;
+  scrape_detail_base_url: string | null;
+  scrape_detail_selector: string | null;
+  scrape_date_selector: string | null;
+  scrape_date_regexp: string | null;
+  scrape_replace_rules: Record<string, string>;
+  entries_count: number;
+};
+
+export type AdminColumnInput = {
+  newspaper_id: number;
+  name: string;
+  source_url?: string | null;
+  scrape_enabled?: boolean;
+  scrape_base_url?: string | null;
+  scrape_list_selector?: string | null;
+  scrape_list_index?: number;
+  scrape_detail_base_url?: string | null;
+  scrape_detail_selector?: string | null;
+  scrape_date_selector?: string | null;
+  scrape_date_regexp?: string | null;
+  scrape_replace_rules?: Record<string, string>;
+};
+
+export async function listAdminColumns(): Promise<AdminColumn[]> {
+  const res = await fetch(buildUrl("/api/admin/columns"), { cache: "no-store" });
+  if (!res.ok) throw new Error(`Failed to list columns: ${res.status}`);
+  return res.json();
+}
+
+export async function getAdminColumn(id: number): Promise<AdminColumn> {
+  const res = await fetch(buildUrl(`/api/admin/columns/${id}`), {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Failed to fetch column: ${res.status}`);
+  return res.json();
+}
+
+export async function createColumn(
+  input: AdminColumnInput
+): Promise<AdminColumn> {
+  const res = await adminFetch("/api/admin/columns", {
+    method: "POST",
+    body: JSON.stringify({ column: input }),
+  });
+  if (!res.ok) {
+    const body = await readErrorBody(res);
+    throw new Error(formatErrors(body) || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function updateColumn(
+  id: number,
+  input: AdminColumnInput
+): Promise<AdminColumn> {
+  const res = await adminFetch(`/api/admin/columns/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ column: input }),
+  });
+  if (!res.ok) {
+    const body = await readErrorBody(res);
+    throw new Error(formatErrors(body) || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function deleteColumn(id: number): Promise<void> {
+  const res = await adminFetch(`/api/admin/columns/${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error(`Failed to delete column: ${res.status}`);
+}
