@@ -305,3 +305,88 @@ export async function deleteColumn(id: number): Promise<void> {
   });
   if (!res.ok) throw new Error(`Failed to delete column: ${res.status}`);
 }
+
+// ===== Admin: Entry =====
+
+export type AdminEntry = {
+  id: number;
+  published_on: string;
+  content: string;
+  source_url: string | null;
+  view_count: number;
+  last_viewed_at: string | null;
+  column: { id: number; name: string };
+  newspaper: { id: number; name: string };
+};
+
+export type AdminEntryListResult = {
+  entries: AdminEntry[];
+  pagination: Pagination;
+};
+
+export type AdminEntryInput = {
+  column_id: number;
+  published_on: string;
+  content: string;
+  source_url?: string | null;
+};
+
+export type AdminEntryFilters = {
+  newspaper_id?: string;
+  column_id?: string;
+  page?: string;
+};
+
+export async function listAdminEntries(
+  filters?: AdminEntryFilters
+): Promise<AdminEntryListResult> {
+  const res = await fetch(buildUrl("/api/admin/entries", filters), {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Failed to list entries: ${res.status}`);
+  return res.json();
+}
+
+export async function getAdminEntry(id: number): Promise<AdminEntry> {
+  const res = await fetch(buildUrl(`/api/admin/entries/${id}`), {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Failed to fetch entry: ${res.status}`);
+  return res.json();
+}
+
+export async function createEntry(
+  input: AdminEntryInput
+): Promise<AdminEntry> {
+  const res = await adminFetch("/api/admin/entries", {
+    method: "POST",
+    body: JSON.stringify({ entry: input }),
+  });
+  if (!res.ok) {
+    const body = await readErrorBody(res);
+    throw new Error(formatErrors(body) || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function updateEntry(
+  id: number,
+  input: AdminEntryInput
+): Promise<AdminEntry> {
+  const res = await adminFetch(`/api/admin/entries/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ entry: input }),
+  });
+  if (!res.ok) {
+    const body = await readErrorBody(res);
+    throw new Error(formatErrors(body) || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function deleteEntry(id: number): Promise<void> {
+  const res = await adminFetch(`/api/admin/entries/${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error(`Failed to delete entry: ${res.status}`);
+}

@@ -42,9 +42,16 @@ export default async function ListPage({ searchParams }: Props) {
         </div>
         <div className="flex flex-col items-end gap-2">
           <ScrapeButton />
-          <span className="text-xs text-stone-500 dark:text-stone-400">
-            {pagination.total_count} 件
-          </span>
+          <div className="flex items-center gap-3 text-xs text-stone-500 dark:text-stone-400">
+            <span>{pagination.total_count} 件</span>
+            <span className="text-stone-300 dark:text-stone-700">·</span>
+            <Link
+              href="/admin"
+              className="hover:underline underline-offset-4"
+            >
+              管理
+            </Link>
+          </div>
         </div>
       </header>
 

@@ -33,6 +33,17 @@ export default function AdminPage() {
             </div>
           </Link>
         </li>
+        <li>
+          <Link
+            href="/admin/entries"
+            className="block rounded border border-stone-300 dark:border-stone-700 p-4 hover:bg-stone-50 dark:hover:bg-stone-900"
+          >
+            <div className="font-medium">記事</div>
+            <div className="text-xs text-stone-500 mt-1">
+              本文の編集・削除・新規追加
+            </div>
+          </Link>
+        </li>
       </ul>
 
       <p className="mt-6 text-sm">
