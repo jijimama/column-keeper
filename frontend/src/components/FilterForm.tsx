@@ -88,6 +88,30 @@ export async function FilterForm({ filters }: Props) {
         </div>
       </div>
 
+      <label className="flex flex-col text-sm">
+        <span className="mb-1 text-stone-600 dark:text-stone-400">本文検索</span>
+        <input
+          type="search"
+          name="q"
+          defaultValue={filters.q ?? ""}
+          placeholder="キーワード"
+          className={fieldClass}
+        />
+      </label>
+
+      <label className="flex flex-col text-sm">
+        <span className="mb-1 text-stone-600 dark:text-stone-400">並び替え</span>
+        <select
+          name="sort"
+          defaultValue={filters.sort ?? ""}
+          className={fieldClass}
+        >
+          <option value="">新しい順</option>
+          <option value="views">閲覧数順</option>
+          <option value="oldest">古い順</option>
+        </select>
+      </label>
+
       <label className="flex items-center gap-2 text-sm pb-1">
         <input
           type="checkbox"
@@ -97,8 +121,19 @@ export async function FilterForm({ filters }: Props) {
           className="size-4 accent-amber-500"
         />
         <span className="text-stone-700 dark:text-stone-300">
-          お気に入りのみ
+          お気に入り
         </span>
+      </label>
+
+      <label className="flex items-center gap-2 text-sm pb-1">
+        <input
+          type="checkbox"
+          name="unread"
+          value="true"
+          defaultChecked={filters.unread === "true"}
+          className="size-4 accent-blue-500"
+        />
+        <span className="text-stone-700 dark:text-stone-300">未読のみ</span>
       </label>
 
       <div className="flex items-center gap-2 ml-auto pb-1">

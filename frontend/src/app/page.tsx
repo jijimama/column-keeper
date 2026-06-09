@@ -11,6 +11,9 @@ type Props = {
     newspaper_id?: string;
     column_id?: string;
     favorited?: string;
+    unread?: string;
+    q?: string;
+    sort?: string;
     month?: string;
     day?: string;
     page?: string;
@@ -23,6 +26,9 @@ export default async function ListPage({ searchParams }: Props) {
     newspaper_id: sp.newspaper_id,
     column_id: sp.column_id,
     favorited: sp.favorited,
+    unread: sp.unread,
+    q: sp.q,
+    sort: sp.sort,
     month: sp.month,
     day: sp.day,
     page: sp.page,

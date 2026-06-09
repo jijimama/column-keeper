@@ -7,11 +7,16 @@ module Api
 
     def index
       scope = ColumnEntry.eager_load(:favorite, column: :newspaper)
-                        .order(published_on: :desc, id: :desc)
 
       scope = scope.where(column_id: params[:column_id]) if params[:column_id].present?
       scope = scope.where(columns: { newspaper_id: params[:newspaper_id] }) if params[:newspaper_id].present?
       scope = scope.where.not(favorites: { id: nil }) if params[:favorited] == "true"
+      scope = scope.where(last_viewed_at: nil) if params[:unread] == "true"
+
+      if params[:q].present?
+        like = "%#{ActiveRecord::Base.sanitize_sql_like(params[:q].to_s.strip)}%"
+        scope = scope.where("column_entries.content LIKE ?", like)
+      end
 
       if params[:month].present?
         scope = scope.where("strftime('%m', published_on) = ?", format("%02d", params[:month].to_i))
@@ -19,6 +24,15 @@ module Api
       if params[:day].present?
         scope = scope.where("strftime('%d', published_on) = ?", format("%02d", params[:day].to_i))
       end
+
+      scope = case params[:sort]
+              when "views"
+                scope.order(view_count: :desc, published_on: :desc, id: :desc)
+              when "oldest"
+                scope.order(published_on: :asc, id: :asc)
+              else
+                scope.order(published_on: :desc, id: :desc)
+              end
 
       per_page = (params[:per_page].presence || DEFAULT_PER_PAGE).to_i.clamp(1, MAX_PER_PAGE)
       page = (params[:page].presence || 1).to_i

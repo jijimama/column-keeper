@@ -32,6 +32,9 @@ export type ColumnEntryFilters = {
   newspaper_id?: string;
   column_id?: string;
   favorited?: string;
+  unread?: string;
+  q?: string;
+  sort?: string;
   month?: string;
   day?: string;
   page?: string;
