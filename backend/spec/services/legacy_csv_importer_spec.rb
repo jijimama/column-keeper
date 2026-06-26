@@ -69,5 +69,13 @@ RSpec.describe LegacyCsvImporter do
         described_class.new(csv_path: path, newspaper_name: "朝日", column_name: "コラム").import!
       }.to change(Newspaper, :count).by(1).and change(Column, :count).by(1)
     end
+
+    it "本文にカンマと改行を含む CSV を正しく取り込む" do
+      content = %Q{2025,1,1,"本文に、カンマあり\nそして改行あり"\n}
+      path = write_csv(content)
+      described_class.new(csv_path: path, newspaper_name: "新聞", column_name: "コラム").import!
+      expect(ColumnEntry.last.content).to include("本文に、カンマあり")
+      expect(ColumnEntry.last.content).to include("そして改行あり")
+    end
   end
 end
