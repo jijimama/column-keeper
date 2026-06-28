@@ -64,6 +64,25 @@ RSpec.describe "Api::ColumnEntries", type: :request do
       expect(body["entries"].size).to eq(1)
       expect(body["pagination"]).to include("page" => 2, "per_page" => 2, "total_pages" => 2, "total_count" => 3)
     end
+
+    it "column_id で絞り込める" do
+      get "/api/column_entries", params: { column_id: tensei.id }
+      ids = JSON.parse(response.body)["entries"].map { |e| e["id"] }
+      expect(ids).to contain_exactly(e1.id, e2.id)
+    end
+
+    it "sort=oldest で published_on 昇順" do
+      get "/api/column_entries", params: { sort: "oldest" }
+      ids = JSON.parse(response.body)["entries"].map { |e| e["id"] }
+      # 2025-01-01 (e2), 2026-01-01 (e1), 2026-05-01 (e3)
+      expect(ids).to eq([e2.id, e1.id, e3.id])
+    end
+
+    it "page 範囲外でも 200、entries は空配列" do
+      get "/api/column_entries", params: { per_page: 2, page: 99 }
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["entries"]).to eq([])
+    end
   end
 
   describe "GET /api/column_entries/:id" do

@@ -100,5 +100,47 @@ RSpec.describe ColumnScraper do
       scraper.scrape!
       expect(ColumnEntry.last.content).to include("本文の段落1")
     end
+
+    it "リダイレクトを追って最終ページから取得" do
+      redirected_url = "https://example.com/articles/123-final"
+      stub_request(:get, list_url).to_return(body: list_html, status: 200)
+      stub_request(:get, detail_url).to_return(
+        status: 302,
+        headers: { "Location" => redirected_url }
+      )
+      stub_request(:get, redirected_url).to_return(body: detail_html, status: 200)
+
+      expect { scraper.scrape! }.to change(ColumnEntry, :count).by(1)
+    end
+
+    it "list_index で指定した順番のリンクを使う" do
+      config["list_index"] = 1
+      other_url = "https://example.com/articles/122"
+      stub_request(:get, list_url).to_return(body: list_html, status: 200)
+      stub_request(:get, other_url).to_return(body: detail_html, status: 200)
+
+      scraper.scrape!
+      expect(ColumnEntry.last.source_url).to eq(other_url)
+    end
+
+    it "本文の半角・全角スペースは整理される" do
+      messy_html = <<~HTML
+        <html><body>
+          <div class="pubdate">2026/01/15</div>
+          <div class="body">
+            <p>　全角スペース付き本文1。</p>
+            <p>   半角スペース付き本文2。   </p>
+          </div>
+        </body></html>
+      HTML
+      stub_request(:get, list_url).to_return(body: list_html, status: 200)
+      stub_request(:get, detail_url).to_return(body: messy_html, status: 200)
+
+      scraper.scrape!
+      # 全角スペースは除去、行末空白も除去
+      expect(ColumnEntry.last.content).to include("全角スペース付き本文1")
+      expect(ColumnEntry.last.content).to include("半角スペース付き本文2")
+      expect(ColumnEntry.last.content).not_to include("　")
+    end
   end
 end
