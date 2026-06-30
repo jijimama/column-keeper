@@ -12,6 +12,9 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    env:
+      RAILS_ENV: test
+      BUNDLE_PATH: vendor/bundle
     steps:
       - uses: actions/checkout@v4
 
@@ -25,8 +28,6 @@ jobs:
         run: |
           bundle exec rails db:create
           bundle exec rails db:migrate
-        env:
-          RAILS_ENV: test
 
       - name: Run RSpec
         run: bundle exec rspec
