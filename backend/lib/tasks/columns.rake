@@ -60,6 +60,24 @@ namespace :columns do
     puts "Import legacy (#{newspaper_name} / #{column_name}): #{stats[:created]} created, #{stats[:updated]} updated, #{stats[:skipped]} skipped"
   end
 
+  desc "scrape_enabled なコラムをすべてスクレイピング。cron から呼ぶ用。Usage: bin/rails columns:scrape_all"
+  task scrape_all: :environment do
+    results = ScrapingRunner.new.run!
+    summary = { "created" => 0, "updated" => 0, "error" => 0 }
+
+    results.each do |r|
+      flag = r[:status] == "error" ? "✗" : "✓"
+      detail = r[:error] ? " (#{r[:error]})" : ""
+      puts "  #{flag} #{r[:newspaper]} / #{r[:column]}: #{r[:status]}#{detail}"
+      summary[r[:status]] ||= 0
+      summary[r[:status]] += 1
+    end
+
+    puts "---"
+    puts "Total: #{summary["created"]} created, #{summary["updated"]} updated, #{summary["error"]} failed"
+    exit(1) if summary["error"] > 0 && summary["created"] + summary["updated"] == 0
+  end
+
   desc "data/sources.yml に従って全 CSV を一括取り込む"
   task import_all: :environment do
     sources_path = Rails.root.join("data", "sources.yml")
